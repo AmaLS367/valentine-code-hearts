@@ -13,6 +13,10 @@ const MESSAGES = [
   "import love from 'тебя';",
 ];
 
+const EMOJI_CONFETTI = ["💖", "✨", "🐱", "🌸", "🍓"] as const;
+const MAX_CONFETTI = 12;
+const CONFETTI_PER_CLICK = 4;
+
 interface Particle {
   id: number;
   x: number;
@@ -22,12 +26,22 @@ interface Particle {
   size: number;
 }
 
+interface EmojiConfettiItem {
+  id: number;
+  emoji: string;
+  dx: number;
+  dy: number;
+  delay: number;
+}
+
 const HeartButton = () => {
   const [count, setCount] = useState(0);
   const [message, setMessage] = useState(MESSAGES[0]);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [popping, setPopping] = useState(false);
+  const [emojiConfetti, setEmojiConfetti] = useState<EmojiConfettiItem[]>([]);
   const particleId = useRef(0);
+  const confettiId = useRef(0);
 
   const handleClick = useCallback(() => {
     setCount((c) => c + 1);
@@ -58,6 +72,25 @@ const HeartButton = () => {
     setTimeout(() => {
       setParticles((p) => p.filter((pt) => !newParticles.includes(pt)));
     }, 800);
+
+    // Emoji confetti (respect reduced motion)
+    const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReducedMotion) {
+      const newConfetti: EmojiConfettiItem[] = Array.from({ length: CONFETTI_PER_CLICK }, () => ({
+        id: confettiId.current++,
+        emoji: EMOJI_CONFETTI[Math.floor(Math.random() * EMOJI_CONFETTI.length)],
+        dx: (Math.random() - 0.5) * 60,
+        dy: (Math.random() - 0.5) * 40,
+        delay: Math.random() * 150,
+      }));
+      setEmojiConfetti((prev) => {
+        const next = [...prev, ...newConfetti];
+        return next.slice(-MAX_CONFETTI);
+      });
+      setTimeout(() => {
+        setEmojiConfetti((prev) => prev.filter((c) => !newConfetti.some((n) => n.id === c.id)));
+      }, 2100);
+    }
   }, []);
 
   return (
@@ -164,6 +197,25 @@ const HeartButton = () => {
             </span>
           );
         })}
+
+        {/* Emoji confetti (kawaii) */}
+        {emojiConfetti.map((c) => (
+          <span
+            key={`confetti-${c.id}`}
+            className="absolute z-30 emoji-confetti"
+            style={{
+              left: "50%",
+              top: "50%",
+              fontSize: "1.5rem",
+              ["--confetti-dx" as string]: `${c.dx}px`,
+              ["--confetti-dy" as string]: `${c.dy}px`,
+              animationDelay: `${c.delay}ms`,
+            }}
+            aria-hidden
+          >
+            {c.emoji}
+          </span>
+        ))}
       </div>
 
       {/* Message */}

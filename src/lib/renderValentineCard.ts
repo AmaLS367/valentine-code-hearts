@@ -13,6 +13,8 @@ export interface ValentineCardData {
   note: string;
 }
 
+export type StickerStyle = "cat" | "hearts" | "sparkles";
+
 /** Simple seeded RNG for deterministic texture */
 function seededRandom(seed: number): () => number {
   let s = seed;
@@ -103,22 +105,40 @@ function drawSparkle(ctx: CanvasRenderingContext2D, cx: number, cy: number, size
   ctx.restore();
 }
 
-function drawDecorations(ctx: CanvasRenderingContext2D) {
+function drawDecorations(ctx: CanvasRenderingContext2D, stickerStyle: StickerStyle) {
   const pad = 40;
   const colors = ["#e8a0b0", "#d88aa0", "#c97b9a"];
-  // Corner hearts
-  drawHeart(ctx, pad + 28, pad + 28, 14, colors[0]);
-  drawHeart(ctx, BASE_W - pad - 28, pad + 28, 12, colors[1]);
-  drawHeart(ctx, pad + 26, BASE_H - pad - 26, 10, colors[2]);
-  drawHeart(ctx, BASE_W - pad - 24, BASE_H - pad - 24, 11, colors[0]);
-  // Sparkles
-  drawSparkle(ctx, pad + 55, pad + 20, 8, "#e8c0d0");
-  drawSparkle(ctx, BASE_W - pad - 50, pad + 22, 6, "#e8c0d0");
-  drawSparkle(ctx, pad + 50, BASE_H - pad - 18, 6, "#e8c0d0");
-  drawSparkle(ctx, BASE_W - pad - 55, BASE_H - pad - 22, 8, "#e8c0d0");
+  const drawHearts = stickerStyle === "hearts" || stickerStyle === "cat";
+  const drawSparkles = stickerStyle === "sparkles" || stickerStyle === "cat";
+
+  if (drawHearts) {
+    drawHeart(ctx, pad + 28, pad + 28, 14, colors[0]);
+    drawHeart(ctx, BASE_W - pad - 28, pad + 28, 12, colors[1]);
+    drawHeart(ctx, pad + 26, BASE_H - pad - 26, 10, colors[2]);
+    drawHeart(ctx, BASE_W - pad - 24, BASE_H - pad - 24, 11, colors[0]);
+    if (stickerStyle === "hearts") {
+      drawHeart(ctx, BASE_W / 2 - 50, pad + 32, 10, colors[1]);
+      drawHeart(ctx, BASE_W / 2 + 50, pad + 32, 10, colors[2]);
+      drawHeart(ctx, pad + 50, BASE_H / 2 - 20, 9, colors[0]);
+      drawHeart(ctx, BASE_W - pad - 50, BASE_H / 2 - 20, 9, colors[1]);
+    }
+  }
+  if (drawSparkles) {
+    drawSparkle(ctx, pad + 55, pad + 20, 8, "#e8c0d0");
+    drawSparkle(ctx, BASE_W - pad - 50, pad + 22, 6, "#e8c0d0");
+    drawSparkle(ctx, pad + 50, BASE_H - pad - 18, 6, "#e8c0d0");
+    drawSparkle(ctx, BASE_W - pad - 55, BASE_H - pad - 22, 8, "#e8c0d0");
+    if (stickerStyle === "sparkles") {
+      drawSparkle(ctx, BASE_W / 2 - 60, pad + 24, 7, "#e8c0d0");
+      drawSparkle(ctx, BASE_W / 2 + 55, pad + 26, 6, "#e8c0d0");
+      drawSparkle(ctx, pad + 70, BASE_H / 2 - 24, 6, "#e8c0d0");
+      drawSparkle(ctx, BASE_W - pad - 65, BASE_H / 2 - 22, 7, "#e8c0d0");
+    }
+  }
 }
 
-function drawCatSticker(ctx: CanvasRenderingContext2D) {
+function drawCatSticker(ctx: CanvasRenderingContext2D, stickerStyle: StickerStyle) {
+  if (stickerStyle !== "cat") return;
   const x = BASE_W - 52;
   const y = BASE_H - 52;
   ctx.save();
@@ -227,11 +247,13 @@ function drawTextContent(ctx: CanvasRenderingContext2D, data: ValentineCardData)
  * @param canvas - Target canvas element
  * @param data - To, From, Note strings
  * @param scale - 1 for preview, 2 for crisp export
+ * @param stickerStyle - "cat" | "hearts" | "sparkles" for extra card decorations
  */
 export function renderValentineCard(
   canvas: HTMLCanvasElement,
   data: ValentineCardData,
-  scale: number = 1
+  scale: number = 1,
+  stickerStyle: StickerStyle = "cat"
 ): void {
   const w = BASE_W * scale;
   const h = BASE_H * scale;
@@ -244,7 +266,7 @@ export function renderValentineCard(
   drawPastelBackground(ctx);
   drawPaperCard(ctx);
   drawNoiseTexture(ctx);
-  drawDecorations(ctx);
-  drawCatSticker(ctx);
+  drawDecorations(ctx, stickerStyle);
+  drawCatSticker(ctx, stickerStyle);
   drawTextContent(ctx, data);
 }

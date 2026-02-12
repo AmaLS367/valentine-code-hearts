@@ -224,4 +224,27 @@
   .animate-counter-pop {
     animation: counter-pop 0.3s ease-out;
   }
+
+  @keyframes emoji-float {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) translate(var(--confetti-dx, 0), var(--confetti-dy, 0)) translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) translate(var(--confetti-dx, 0), var(--confetti-dy, 0)) translateY(-90px) scale(0.9);
+    }
+  }
+
+  .emoji-confetti {
+    animation: emoji-float 2s ease-out forwards;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji-confetti {
+    animation: none;
+    opacity: 0;
+  }
 }

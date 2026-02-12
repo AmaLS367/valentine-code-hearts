@@ -1,10 +1,17 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { renderValentineCard } from "@/lib/renderValentineCard";
+import { renderValentineCard, type StickerStyle } from "@/lib/renderValentineCard";
+
+const STICKER_OPTIONS: { value: StickerStyle; label: string }[] = [
+  { value: "cat", label: "Котик" },
+  { value: "hearts", label: "Сердечки" },
+  { value: "sparkles", label: "Звёздочки" },
+];
 
 const ValentineGenerator = () => {
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [note, setNote] = useState("");
+  const [stickerStyle, setStickerStyle] = useState<StickerStyle>("cat");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const data = { to, from, note };
@@ -12,8 +19,8 @@ const ValentineGenerator = () => {
   const drawPreview = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    renderValentineCard(canvas, data, 1);
-  }, [to, from, note]);
+    renderValentineCard(canvas, data, 1, stickerStyle);
+  }, [to, from, note, stickerStyle]);
 
   useEffect(() => {
     drawPreview();
@@ -21,12 +28,12 @@ const ValentineGenerator = () => {
 
   const handleDownload = useCallback(() => {
     const off = document.createElement("canvas");
-    renderValentineCard(off, data, 2);
+    renderValentineCard(off, data, 2, stickerStyle);
     const link = document.createElement("a");
     link.download = `valentine-${to?.trim() || "card"}.png`;
     link.href = off.toDataURL("image/png");
     link.click();
-  }, [to, from, note]);
+  }, [to, from, note, stickerStyle]);
 
   return (
     <section className="w-full max-w-md mx-auto" aria-label="Генератор валентинок">
@@ -78,6 +85,26 @@ const ValentineGenerator = () => {
             placeholder="Короткая записка..."
             className="w-full px-4 py-2.5 rounded-lg bg-secondary text-secondary-foreground border border-border focus:outline-none focus:ring-2 focus:ring-ring transition-shadow resize-none"
           />
+        </div>
+
+        <div>
+          <span className="text-sm font-semibold text-muted-foreground mb-2 block">Стикеры на открытке</span>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Выбор стикеров">
+            {STICKER_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setStickerStyle(opt.value)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  stickerStyle === opt.value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-secondary text-secondary-foreground border-border hover:bg-secondary/80"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Live preview — matches downloaded PNG at 1x; download uses 2x for crisp PNG */}

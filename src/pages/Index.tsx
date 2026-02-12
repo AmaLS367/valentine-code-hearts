@@ -14,12 +14,9 @@ const Index = () => {
           {/* Left column: header + heart / counter / messages */}
           <div className="flex flex-col gap-8">
             <header className="glass-card rounded-2xl p-6 sm:p-8 text-center w-full animate-fade-up">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-2">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground">
                 Happy Valentine's Day 💘
               </h1>
-              <p className="text-muted-foreground font-semibold text-base sm:text-lg">
-                Made with <span className="text-valentine-pink">❤️</span> + JS
-              </p>
             </header>
 
             <section
