@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { renderValentineCard } from "@/lib/renderValentineCard";
 
 const ValentineGenerator = () => {
   const [to, setTo] = useState("");
@@ -6,84 +7,24 @@ const ValentineGenerator = () => {
   const [note, setNote] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateCard = useCallback(() => {
+  const data = { to, from, note };
+
+  const drawPreview = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    renderValentineCard(canvas, data, 1);
+  }, [to, from, note]);
 
-    const w = 600;
-    const h = 400;
-    canvas.width = w;
-    canvas.height = h;
+  useEffect(() => {
+    drawPreview();
+  }, [drawPreview]);
 
-    // Background gradient
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, "#fce4ec");
-    grad.addColorStop(0.5, "#f8bbd0");
-    grad.addColorStop(1, "#f48fb1");
-    ctx.fillStyle = grad;
-    ctx.roundRect(0, 0, w, h, 20);
-    ctx.fill();
-
-    // Draw decorative hearts
-    ctx.font = "28px serif";
-    const hearts = ["💕", "💗", "💖", "❤️", "💘"];
-    for (let i = 0; i < 12; i++) {
-      ctx.globalAlpha = 0.2 + Math.random() * 0.15;
-      ctx.fillText(
-        hearts[Math.floor(Math.random() * hearts.length)],
-        Math.random() * w,
-        Math.random() * h
-      );
-    }
-    ctx.globalAlpha = 1;
-
-    // Title
-    ctx.fillStyle = "#880e4f";
-    ctx.font = "bold 32px 'Nunito', system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("Happy Valentine's Day 💘", w / 2, 70);
-
-    // To / From
-    ctx.font = "22px 'Nunito', system-ui, sans-serif";
-    ctx.fillStyle = "#ad1457";
-    ctx.fillText(`Для: ${to || "..."}`, w / 2, 140);
-    ctx.fillText(`От: ${from || "..."}`, w / 2, 175);
-
-    // Note
-    ctx.font = "18px 'Nunito', system-ui, sans-serif";
-    ctx.fillStyle = "#6a1b4d";
-
-    // Word-wrap note
-    const words = (note || "С любовью ❤️").split(" ");
-    let line = "";
-    let y = 240;
-    const maxWidth = w - 80;
-
-    for (const word of words) {
-      const test = line + word + " ";
-      if (ctx.measureText(test).width > maxWidth && line) {
-        ctx.fillText(line.trim(), w / 2, y);
-        line = word + " ";
-        y += 28;
-      } else {
-        line = test;
-      }
-    }
-    ctx.fillText(line.trim(), w / 2, y);
-
-    // Footer
-    ctx.font = "14px 'Nunito', system-ui, sans-serif";
-    ctx.fillStyle = "#c2185b";
-    ctx.globalAlpha = 0.6;
-    ctx.fillText("Made with ❤️ + JS", w / 2, h - 25);
-    ctx.globalAlpha = 1;
-
-    // Download as PNG
+  const handleDownload = useCallback(() => {
+    const off = document.createElement("canvas");
+    renderValentineCard(off, data, 2);
     const link = document.createElement("a");
-    link.download = `valentine-${to || "card"}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.download = `valentine-${to?.trim() || "card"}.png`;
+    link.href = off.toDataURL("image/png");
     link.click();
   }, [to, from, note]);
 
@@ -139,17 +80,26 @@ const ValentineGenerator = () => {
           />
         </div>
 
+        {/* Live preview — matches downloaded PNG at 1x; download uses 2x for crisp PNG */}
+        <div className="rounded-xl overflow-hidden border border-border bg-muted/30 flex justify-center">
+          <canvas
+            ref={canvasRef}
+            width={600}
+            height={400}
+            className="w-full max-w-full h-auto"
+            style={{ maxHeight: "320px", objectFit: "contain" }}
+            aria-label="Предпросмотр открытки"
+          />
+        </div>
+
         <button
-          onClick={generateCard}
+          onClick={handleDownload}
           className="heart-button py-3 px-6 rounded-xl font-bold text-base animate-none hover:scale-105 active:scale-95 transition-transform cursor-pointer"
           aria-label="Скачать открытку как PNG"
         >
           📥 Скачать открытку
         </button>
       </div>
-
-      {/* Hidden canvas for generation */}
-      <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
     </section>
   );
 };
