@@ -94,7 +94,14 @@ const HeartButton = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-6 w-full">
+      <h3 className="text-lg sm:text-xl font-bold text-foreground font-display">
+        Жми на сердце
+      </h3>
+      <p className="text-sm text-muted-foreground text-center -mt-2">
+        Каждый клик — новая фраза и немного настроения
+      </p>
+
       {/* Love counter */}
       <div
         className={`text-lg font-bold text-valentine-deep ${popping ? "animate-counter-pop" : ""}`}
@@ -221,11 +228,14 @@ const HeartButton = () => {
       {/* Message */}
       <div
         key={message}
-        className="animate-fade-up max-w-xs sm:max-w-sm text-center px-4 py-3 rounded-xl bg-secondary/90 text-secondary-foreground font-medium text-sm sm:text-base border border-border/50"
+        className="animate-fade-up w-full max-w-sm text-center px-4 py-3 rounded-xl bg-secondary/90 text-secondary-foreground font-medium text-sm sm:text-base border border-border/50"
         aria-live="polite"
       >
         <code className="font-display tracking-tight">{message}</code>
       </div>
+      <p className="text-xs text-muted-foreground">
+        Чем больше жмёшь — тем теплее 💕
+      </p>
     </div>
   );
 };
