@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         display: ["var(--font-display)"],
+        body: ["var(--font-body)"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -57,6 +58,7 @@ export default {
           deep: "hsl(var(--valentine-deep))",
           warm: "hsl(var(--valentine-warm))",
           glow: "hsl(var(--valentine-glow))",
+          soft: "hsl(var(--valentine-soft))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

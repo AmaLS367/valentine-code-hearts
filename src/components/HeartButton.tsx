@@ -221,10 +221,10 @@ const HeartButton = () => {
       {/* Message */}
       <div
         key={message}
-        className="animate-fade-up max-w-xs sm:max-w-sm text-center px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm sm:text-base"
+        className="animate-fade-up max-w-xs sm:max-w-sm text-center px-4 py-3 rounded-xl bg-secondary/90 text-secondary-foreground font-medium text-sm sm:text-base border border-border/50"
         aria-live="polite"
       >
-        <code className="font-display">{message}</code>
+        <code className="font-display tracking-tight">{message}</code>
       </div>
     </div>
   );

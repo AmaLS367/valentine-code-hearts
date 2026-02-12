@@ -37,7 +37,7 @@ const ValentineGenerator = () => {
 
   return (
     <section className="w-full max-w-md mx-auto" aria-label="Генератор валентинок">
-      <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center mb-4">
+      <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center mb-5 font-display">
         💌 Сгенерировать валентинку
       </h2>
 
@@ -108,7 +108,7 @@ const ValentineGenerator = () => {
         </div>
 
         {/* Live preview — matches downloaded PNG at 1x; download uses 2x for crisp PNG */}
-        <div className="rounded-xl overflow-hidden border border-border bg-muted/30 flex justify-center">
+        <div className="rounded-xl overflow-hidden border border-border bg-muted/40 flex justify-center shadow-sm">
           <canvas
             ref={canvasRef}
             width={600}
@@ -121,7 +121,7 @@ const ValentineGenerator = () => {
 
         <button
           onClick={handleDownload}
-          className="heart-button py-3 px-6 rounded-xl font-bold text-base animate-none hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+          className="heart-button py-3 px-6 rounded-xl font-bold text-base font-display animate-none cursor-pointer"
           aria-label="Скачать открытку как PNG"
         >
           📥 Скачать открытку

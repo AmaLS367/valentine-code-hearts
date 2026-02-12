@@ -2,10 +2,33 @@
  * Renders a pastel valentine card to a canvas.
  * Uses scale for crisp export (e.g. 2 = 2x resolution).
  * All drawing is in logical units; canvas size = base * scale.
+ * Colors aligned with site palette (valentine pink/rose/blush/deep).
  */
 
 const BASE_W = 600;
 const BASE_H = 400;
+
+/** Palette for card (hex); matches CSS --valentine-* and gradients */
+const CARD_PALETTE = {
+  bgStart: "#faf1f3",
+  bgPeach: "#fceee4",
+  bgLavenderPink: "#f5e8f0",
+  bgLavender: "#ebe5f0",
+  paper: "rgba(255, 252, 250, 0.98)",
+  paperShadow: "rgba(0,0,0,0.08)",
+  noise: "#c9a8ac",
+  heartPrimary: "#e05a7e",
+  heartSecondary: "#d94a72",
+  heartTertiary: "#c93d68",
+  sparkle: "#e8b8c8",
+  title: "#7a2d4a",
+  toFrom: "#9a3660",
+  note: "#6b3d58",
+  catFill: "#f5d0c8",
+  catStroke: "#d4a89a",
+  catEyes: "#5c4a42",
+  catNose: "#c49a8a",
+} as const;
 
 export interface ValentineCardData {
   to: string;
@@ -26,10 +49,10 @@ function seededRandom(seed: number): () => number {
 
 function drawPastelBackground(ctx: CanvasRenderingContext2D) {
   const g = ctx.createLinearGradient(0, 0, BASE_W, BASE_H);
-  g.addColorStop(0, "#fce4ec");   // pink
-  g.addColorStop(0.4, "#ffecd2"); // peach
-  g.addColorStop(0.7, "#f8e1f4"); // lavender-pink
-  g.addColorStop(1, "#e8e0f0");   // lavender
+  g.addColorStop(0, CARD_PALETTE.bgStart);
+  g.addColorStop(0.4, CARD_PALETTE.bgPeach);
+  g.addColorStop(0.7, CARD_PALETTE.bgLavenderPink);
+  g.addColorStop(1, CARD_PALETTE.bgLavender);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, BASE_W, BASE_H);
 }
@@ -43,10 +66,10 @@ function drawPaperCard(ctx: CanvasRenderingContext2D) {
   const r = 24;
 
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.12)";
+  ctx.shadowColor = CARD_PALETTE.paperShadow;
   ctx.shadowBlur = 24;
   ctx.shadowOffsetY = 8;
-  ctx.fillStyle = "rgba(255, 252, 250, 0.98)";
+  ctx.fillStyle = CARD_PALETTE.paper;
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
   ctx.fill();
@@ -62,7 +85,7 @@ function drawNoiseTexture(ctx: CanvasRenderingContext2D) {
   const rand = seededRandom(12345);
   ctx.save();
   ctx.globalAlpha = 0.06;
-  ctx.fillStyle = "#c4a0a0";
+  ctx.fillStyle = CARD_PALETTE.noise;
   for (let i = 0; i < 800; i++) {
     const px = x + rand() * w;
     const py = y + rand() * h;
@@ -107,7 +130,8 @@ function drawSparkle(ctx: CanvasRenderingContext2D, cx: number, cy: number, size
 
 function drawDecorations(ctx: CanvasRenderingContext2D, stickerStyle: StickerStyle) {
   const pad = 40;
-  const colors = ["#e8a0b0", "#d88aa0", "#c97b9a"];
+  const colors = [CARD_PALETTE.heartPrimary, CARD_PALETTE.heartSecondary, CARD_PALETTE.heartTertiary];
+  const sparkleColor = CARD_PALETTE.sparkle;
   const drawHearts = stickerStyle === "hearts" || stickerStyle === "cat";
   const drawSparkles = stickerStyle === "sparkles" || stickerStyle === "cat";
 
@@ -124,15 +148,15 @@ function drawDecorations(ctx: CanvasRenderingContext2D, stickerStyle: StickerSty
     }
   }
   if (drawSparkles) {
-    drawSparkle(ctx, pad + 55, pad + 20, 8, "#e8c0d0");
-    drawSparkle(ctx, BASE_W - pad - 50, pad + 22, 6, "#e8c0d0");
-    drawSparkle(ctx, pad + 50, BASE_H - pad - 18, 6, "#e8c0d0");
-    drawSparkle(ctx, BASE_W - pad - 55, BASE_H - pad - 22, 8, "#e8c0d0");
+    drawSparkle(ctx, pad + 55, pad + 20, 8, sparkleColor);
+    drawSparkle(ctx, BASE_W - pad - 50, pad + 22, 6, sparkleColor);
+    drawSparkle(ctx, pad + 50, BASE_H - pad - 18, 6, sparkleColor);
+    drawSparkle(ctx, BASE_W - pad - 55, BASE_H - pad - 22, 8, sparkleColor);
     if (stickerStyle === "sparkles") {
-      drawSparkle(ctx, BASE_W / 2 - 60, pad + 24, 7, "#e8c0d0");
-      drawSparkle(ctx, BASE_W / 2 + 55, pad + 26, 6, "#e8c0d0");
-      drawSparkle(ctx, pad + 70, BASE_H / 2 - 24, 6, "#e8c0d0");
-      drawSparkle(ctx, BASE_W - pad - 65, BASE_H / 2 - 22, 7, "#e8c0d0");
+      drawSparkle(ctx, BASE_W / 2 - 60, pad + 24, 7, sparkleColor);
+      drawSparkle(ctx, BASE_W / 2 + 55, pad + 26, 6, sparkleColor);
+      drawSparkle(ctx, pad + 70, BASE_H / 2 - 24, 6, sparkleColor);
+      drawSparkle(ctx, BASE_W - pad - 65, BASE_H / 2 - 22, 7, sparkleColor);
     }
   }
 }
@@ -143,16 +167,16 @@ function drawCatSticker(ctx: CanvasRenderingContext2D, stickerStyle: StickerStyl
   const y = BASE_H - 52;
   ctx.save();
   // Head circle
-  ctx.fillStyle = "#f5d0c8";
-  ctx.strokeStyle = "#d4a89a";
+  ctx.fillStyle = CARD_PALETTE.catFill;
+  ctx.strokeStyle = CARD_PALETTE.catStroke;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(x, y, 22, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   // Ears
-  ctx.fillStyle = "#f5d0c8";
-  ctx.strokeStyle = "#d4a89a";
+  ctx.fillStyle = CARD_PALETTE.catFill;
+  ctx.strokeStyle = CARD_PALETTE.catStroke;
   ctx.beginPath();
   ctx.moveTo(x - 18, y - 8);
   ctx.lineTo(x - 10, y - 28);
@@ -166,13 +190,13 @@ function drawCatSticker(ctx: CanvasRenderingContext2D, stickerStyle: StickerStyl
   ctx.fill();
   ctx.stroke();
   // Eyes
-  ctx.fillStyle = "#5c4a42";
+  ctx.fillStyle = CARD_PALETTE.catEyes;
   ctx.beginPath();
   ctx.arc(x - 7, y - 4, 3, 0, Math.PI * 2);
   ctx.arc(x + 7, y - 4, 3, 0, Math.PI * 2);
   ctx.fill();
   // Nose
-  ctx.fillStyle = "#c49a8a";
+  ctx.fillStyle = CARD_PALETTE.catNose;
   ctx.beginPath();
   ctx.moveTo(x, y + 2);
   ctx.lineTo(x - 4, y + 8);
@@ -199,21 +223,21 @@ function drawTextContent(ctx: CanvasRenderingContext2D, data: ValentineCardData)
   ctx.textBaseline = "top";
 
   // Title
-  ctx.fillStyle = "#8b2e5c";
-  ctx.font = "bold 28px 'Nunito', system-ui, sans-serif";
+  ctx.fillStyle = CARD_PALETTE.title;
+  ctx.font = "bold 28px 'Quicksand', 'Nunito', system-ui, sans-serif";
   ctx.fillText("Happy Valentine's Day 💘", BASE_W / 2, innerTop);
 
   let y = innerTop + 44;
 
   // To
-  ctx.fillStyle = "#a83d6b";
-  ctx.font = "18px 'Nunito', system-ui, sans-serif";
+  ctx.fillStyle = CARD_PALETTE.toFrom;
+  ctx.font = "18px 'Quicksand', 'Nunito', system-ui, sans-serif";
   ctx.fillText(`To: ${toStr}`, BASE_W / 2, y);
   y += lineHeight + 8;
 
   // Note (word wrap)
-  ctx.fillStyle = "#6b3a52";
-  ctx.font = "16px 'Nunito', system-ui, sans-serif";
+  ctx.fillStyle = CARD_PALETTE.note;
+  ctx.font = "16px 'Quicksand', 'Nunito', system-ui, sans-serif";
   const words = noteStr.split(/\s+/);
   let line = "";
   const lines: string[] = [];
@@ -237,8 +261,8 @@ function drawTextContent(ctx: CanvasRenderingContext2D, data: ValentineCardData)
   y += 12;
 
   // From
-  ctx.fillStyle = "#a83d6b";
-  ctx.font = "18px 'Nunito', system-ui, sans-serif";
+  ctx.fillStyle = CARD_PALETTE.toFrom;
+  ctx.font = "18px 'Quicksand', 'Nunito', system-ui, sans-serif";
   ctx.fillText(`From: ${fromStr}`, BASE_W / 2, y);
 }
 
